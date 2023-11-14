@@ -5,7 +5,8 @@ namespace Cekay.Grifball
 {
     public class Health : UdonSharpBehaviour
     {
-        [SerializeField] private Player LocalPlayer;
+        public Player LocalPlayer;
+
         [SerializeField] private GameObject HealthPack;
         [SerializeField] private Collider HealthParent;
         [SerializeField] private AudioClip Heal;

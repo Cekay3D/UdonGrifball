@@ -7,7 +7,7 @@ namespace Cekay.Grifball
 {
     public class Goal : UdonSharpBehaviour
     {
-        [SerializeField] private Combat CombatScript;
+        public Combat CombatScript;
 
         [SerializeField] private TextMeshProUGUI RedPointsDisplay;
         public GameObject RedExplosion;
@@ -20,28 +20,42 @@ namespace Cekay.Grifball
             // Red score
             if (other.gameObject.layer == CombatScript.RedBombLayer && gameObject.layer == CombatScript.BlueGoalLayer)
             {
+                CombatScript.IsPaused = true;
+
                 BlueExplosion.SetActive(true);
 
                 CombatScript.BlueGoal.enabled = false;
-                CombatScript.SendCustomNetworkEvent(NetworkEventTarget.All, nameof(Goal));
+                CombatScript.SendCustomNetworkEvent(NetworkEventTarget.All, nameof(CombatScript.GoalGet));
                 CombatScript.RedPoints += 1;
                 RedPointsDisplay.text = CombatScript.RedPoints.ToString();
 
-                SendCustomEventDelayedSeconds(nameof(ResetBlue), 6.0f);
+                SendCustomNetworkEvent(NetworkEventTarget.All, nameof(WaitResetBlue));
             }
             // Blue score
             else if (other.gameObject.layer == CombatScript.BlueBombLayer && gameObject.layer == CombatScript.RedGoalLayer)
             {
+                CombatScript.IsPaused = true;
+
                 RedExplosion.SetActive(true);
 
-                CombatScript.SendCustomNetworkEvent(NetworkEventTarget.All, nameof(Goal));
+                CombatScript.SendCustomNetworkEvent(NetworkEventTarget.All, nameof(CombatScript.GoalGet));
 
                 CombatScript.RedGoal.enabled = false;
                 CombatScript.BluePoints += 1;
                 BluePointsDisplay.text = CombatScript.BluePoints.ToString();
 
-                SendCustomEventDelayedSeconds(nameof(ResetRed), 6.0f);
+                SendCustomNetworkEvent(NetworkEventTarget.All, nameof(WaitResetRed));
             }
+        }
+
+        public void WaitResetRed()
+        {
+            SendCustomEventDelayedSeconds(nameof(ResetRed), 5.0f);
+        }
+
+        public void WaitResetBlue()
+        {
+            SendCustomEventDelayedSeconds(nameof(ResetBlue), 5.0f);
         }
 
         public void ResetBlue()

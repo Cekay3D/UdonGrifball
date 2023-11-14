@@ -1,8 +1,11 @@
 ﻿using UdonSharp;
+using UnityEngine;
 using VRC.SDK3.Data;
 
 public class Stats : UdonSharpBehaviour
 {
+    public string GameStatsJSON;
+
     private DataDictionary GameStats = new DataDictionary()
     {
         {"Game 1", new DataDictionary()
@@ -24,13 +27,37 @@ public class Stats : UdonSharpBehaviour
                 {"Kills", 0},
                 {"Deaths", 0},
                 {"K/D Ratio", 0.0f},
-                {"Goals", 0}
+                {"Goals", 0},
+                {"Multikill", 0},
+                {"Spree", 0}
             }
         }
     };
 
-    void Start()
+    [UdonSynced] public int BlueWins = 0;
+    [UdonSynced] public int RedWins = 0;
+
+    public override void OnPreSerialization()
     {
-        
+        if (VRCJson.TrySerializeToJson(GameStats, JsonExportType.Minify, out DataToken resultG))
+        {
+            GameStatsJSON = resultG.String;
+        }
+        else
+        {
+            Debug.LogError(resultG.ToString());
+        }
+    }
+
+    public override void OnDeserialization()
+    {
+        if (VRCJson.TryDeserializeFromJson(GameStatsJSON, out DataToken resultG))
+        {
+            GameStats = resultG.DataDictionary;
+        }
+        else
+        {
+            Debug.LogError(resultG.ToString());
+        }
     }
 }

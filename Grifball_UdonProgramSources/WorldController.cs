@@ -10,14 +10,14 @@ namespace Cekay.Grifball
 
         [SerializeField] private SettingsPage Settings;
 
-        public void OnPlayerJoined()
-        {
-            Settings.InterfaceAudio.PlayOneShot(Join);
-        }
+        //public void OnPlayerJoined()
+        //{
+        //    Settings.InterfaceAudio.PlayOneShot(Join);
+        //}
 
-        public void OnPlayerLeft()
-        {
-            Settings.InterfaceAudio.PlayOneShot(Leave);
-        }
+        //public void OnPlayerLeft()
+        //{
+        //    Settings.InterfaceAudio.PlayOneShot(Leave);
+        //}
     }
 }

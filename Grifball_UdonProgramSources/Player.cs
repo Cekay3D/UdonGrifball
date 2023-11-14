@@ -7,8 +7,10 @@ namespace Cekay.Grifball
 {
     public class Player : UdonSharpBehaviour
     {
-        [SerializeField] private Combat CombatScript;
-        [SerializeField] private SettingsPage Settings;
+        public Combat CombatScript;
+        public SettingsPage Settings;
+
+        private VRCPlayerApi LocalPlayerAPI;
 
         [SerializeField] private AudioSource Announcer;
         [SerializeField] private AudioClip Beep;
@@ -21,13 +23,11 @@ namespace Cekay.Grifball
         [SerializeField] private PostProcessVolume Hurt;
         [SerializeField] private PostProcessVolume Dead;
 
-        private VRCPlayerApi LocalPlayerAPI;
-
         [SerializeField] private GameObject[] BlueSpawns;
         [SerializeField] private GameObject[] RedSpawns;
 
         public int PlayerHealth = 100;
-        public int RespawnCountdown = 3;
+        public int RespawnCountdown = 5;
 
         private void Start()
         {
@@ -38,11 +38,11 @@ namespace Cekay.Grifball
         {
             Hurt.enabled = false;
             Dead.enabled = true;
-            LocalPlayerAPI.SetVoiceGain(0.0f);
-            LocalPlayerAPI.SetWalkSpeed(0.0f);
-            LocalPlayerAPI.SetStrafeSpeed(0.0f);
-            LocalPlayerAPI.SetRunSpeed(0.0f);
-            LocalPlayerAPI.SetJumpImpulse(0.0f);
+            Settings.LocalPlayer.SetVoiceGain(0.0f);
+            Settings.LocalPlayer.SetWalkSpeed(0.0f);
+            Settings.LocalPlayer.SetStrafeSpeed(0.0f);
+            Settings.LocalPlayer.SetRunSpeed(0.0f);
+            Settings.LocalPlayer.SetJumpImpulse(0.0f);
 
             SendCustomEventDelayedSeconds(nameof(RespawnTimer), 1.0f);
         }
@@ -77,16 +77,16 @@ namespace Cekay.Grifball
                 selectedSpawn = RedSpawns[spawnInt];
             }
 
-            LocalPlayerAPI.TeleportTo(selectedSpawn.transform.position, selectedSpawn.transform.rotation);
+            Settings.LocalPlayer.TeleportTo(selectedSpawn.transform.position, selectedSpawn.transform.rotation);
 
             Dead.enabled = false;
             PostStart.enabled = true;
             Announcer.PlayOneShot(RespawnSound);
-            LocalPlayerAPI.SetVoiceGain(1.0f);
-            LocalPlayerAPI.SetWalkSpeed(Settings.MoveSpeed);
-            LocalPlayerAPI.SetStrafeSpeed(Settings.MoveSpeed);
-            LocalPlayerAPI.SetRunSpeed(Settings.MoveSpeed);
-            LocalPlayerAPI.SetJumpImpulse(Settings.JumpHeight);
+            Settings.LocalPlayer.SetVoiceGain(1.0f);
+            Settings.LocalPlayer.SetWalkSpeed(Settings.MoveSpeed);
+            Settings.LocalPlayer.SetStrafeSpeed(Settings.MoveSpeed);
+            Settings.LocalPlayer.SetRunSpeed(Settings.MoveSpeed);
+            Settings.LocalPlayer.SetJumpImpulse(Settings.JumpHeight);
         }
 
         private void KillBetrayal()

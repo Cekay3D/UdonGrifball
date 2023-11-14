@@ -11,8 +11,10 @@ namespace Cekay.Grifball
     [UdonBehaviourSyncMode(BehaviourSyncMode.Manual)]
     public class PooledFunctions : CyanPlayerObjectPoolObject
     {
-        [SerializeField] private Combat CombatScript;
-        [SerializeField] private SettingsPage Settings;
+        public HUD HeadsUp;
+        public Combat CombatScript;
+        public SettingsPage Settings;
+
         [SerializeField] private GameObject Hammer;
         [SerializeField] private GameObject HammerZone;
         [SerializeField] private AudioSource HammerAudio;
@@ -58,8 +60,16 @@ namespace Cekay.Grifball
                 return;
             }
 
-            transform.position = Owner.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).position;
-            transform.rotation = Owner.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).rotation;
+            if (Settings.LeftHanded)
+            {
+                transform.position = Owner.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).position;
+                transform.rotation = Owner.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).rotation;
+            }
+            else
+            {
+                transform.position = Owner.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).position;
+                transform.rotation = Owner.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation;
+            }
 
             if (CombatScript.InProgress == true)
             {
@@ -101,7 +111,7 @@ namespace Cekay.Grifball
 
         // TODO: Move local player functions to be pooled so each PlayerAPI can easily be called
 
-        //public void OnPlayerCollisionEnter(VRCPlayerApi Player)
+        //public override void OnPlayerCollisionEnter(VRCPlayerApi Player)
         //{
         //    if (Player != _localPlayer)
         //    {
@@ -127,7 +137,6 @@ namespace Cekay.Grifball
         //    }
         //}
 
-
         public void GameStarted()
         {
             var mats = Hammer.GetComponent<MeshRenderer>().sharedMaterials;
@@ -151,11 +160,26 @@ namespace Cekay.Grifball
             Hammer.SetActive(false);
         }
 
+        public void HammerHide()
+        {
+            Hammer.SetActive(false);
+        }
+
+        public void HammerShow()
+        {
+            Hammer.SetActive(true);
+        }
+
         public void SwingHammer()
         {
             HammerZone.SetActive(true);
             HammerAudio.PlayOneShot(CombatScript.Melees[Random.Range(0, CombatScript.Melees.Length)]);
             SendCustomEventDelayedSeconds(nameof(ResetHammer), 2.0f);
+
+            if (Settings.ShowMeter)
+            {
+                HeadsUp.EnableSwingMeter();
+            }
         }
 
         public void ResetHammer()
