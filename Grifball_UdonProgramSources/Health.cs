@@ -9,8 +9,6 @@ namespace Cekay.Grifball
 {
     public class Health : UdonSharpBehaviour
     {
-        public Player LocalPlayer;
-
         public CyanPlayerObjectAssigner ObjAssign;
 
         [SerializeField] private GameObject HealthPack;

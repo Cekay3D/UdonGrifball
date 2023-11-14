@@ -14,7 +14,6 @@ namespace Cekay.Grifball
         public HUD HeadsUp;
         public Combat CombatScript;
         public SettingsPage Settings;
-        public Player PlayerLocal;
 
         [SerializeField] private GameObject Hammer;
         [SerializeField] private GameObject HammerZone;
@@ -27,6 +26,8 @@ namespace Cekay.Grifball
         [SerializeField] private GameObject DeadPost;
         [SerializeField] private GameObject SpawnPost;
         [SerializeField] private GameObject EndPost;
+
+        [SerializeField] private ParticleSystem Confetti;
 
         private VRCPlayerApi _localPlayer;
         public string LocalPlayerName;
@@ -133,6 +134,11 @@ namespace Cekay.Grifball
             Settings.LocalPlayer.SetRunSpeed(0.0f);
             Settings.LocalPlayer.SetJumpImpulse(0.0f);
 
+            if (LocalPlayerName == "Cekay")
+            {
+                SendCustomNetworkEvent(NetworkEventTarget.All, nameof(Cekay));
+            }
+
             SendCustomEventDelayedSeconds(nameof(RespawnTimer), 2.0f);
         }
 
@@ -188,6 +194,10 @@ namespace Cekay.Grifball
             else if (CombatScript.CurrentTeam == "Red")
             {
                 selectedSpawn = CombatScript.RedSpawns[spawnInt];
+            }
+            else
+            {
+                selectedSpawn = CombatScript.BlueSpawns[spawnInt];
             }
 
             Settings.LocalPlayer.TeleportTo(selectedSpawn.transform.position, selectedSpawn.transform.rotation);
@@ -259,6 +269,14 @@ namespace Cekay.Grifball
         public void ResetSwing()
         {
             Swinging = false;
+        }
+
+        public void Cekay()
+        {
+            Confetti.transform.position = Owner.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).position;
+            Confetti.transform.rotation = Owner.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).rotation;
+            Confetti.Play();
+            Settings.AnnouncerAudio.PlayOneShot(CombatScript.Birthday);
         }
     }
 }

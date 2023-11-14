@@ -12,7 +12,6 @@ namespace Cekay.Grifball
 {
     public class Combat : UdonSharpBehaviour
     {
-        public Player PlayerLocal;
         public SettingsPage Settings;
         public PooledFunctions[] Players;
 
@@ -62,6 +61,7 @@ namespace Cekay.Grifball
         public AudioClip Betrayed;
         public AudioClip RespawnSound;
         public AudioClip Hit;
+        public AudioClip Birthday;
         [SerializeField] private AudioClip Final;
 
         [SerializeField] private AudioClip s1;
