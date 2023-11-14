@@ -44,8 +44,8 @@ namespace Cekay.Grifball
         [SerializeField] private TextMeshProUGUI GameCountdownDisplay;
 
         public AudioSource Announcer;
-        [SerializeField] private AudioClip Beep;
-        [SerializeField] private AudioClip Boop;
+        public AudioClip Beep;
+        public AudioClip Boop;
         [SerializeField] private AudioClip PlayBall;
         [SerializeField] private AudioClip BombTaken;
         [SerializeField] private AudioClip BombDropped;
@@ -58,7 +58,7 @@ namespace Cekay.Grifball
         [SerializeField] private AudioClip SuddenDeath;
         [SerializeField] private AudioClip RoundOver;
         [SerializeField] private AudioClip GameOver;
-        [SerializeField] private AudioClip RespawnSound;
+        public AudioClip RespawnSound;
         [SerializeField] private AudioClip Final;
 
         [SerializeField] private AudioClip s1;
@@ -126,6 +126,7 @@ namespace Cekay.Grifball
         public int BlueBombLayer = 27;
         public int BlueGoalLayer = 23;
         public int BlueKillLayer = 29;
+        public GameObject[] BlueSpawns;
 
         public Collider RedGoal;
         [UdonSynced] public int RedPoints;
@@ -134,6 +135,7 @@ namespace Cekay.Grifball
         public int RedBombLayer = 26;
         public int RedGoalLayer = 22;
         public int RedKillLayer = 30;
+        public GameObject[] RedSpawns;
 
         public DataDictionary PreviousGames;
 
@@ -209,15 +211,14 @@ namespace Cekay.Grifball
 
             foreach (PooledFunctions p in Players)
             {
-                p.GameStarted();
+                p.SendCustomNetworkEvent(NetworkEventTarget.All, "GameStarted");
+                p.SendCustomNetworkEvent(NetworkEventTarget.All, "Respawn");
             }
 
             PostStart.gameObject.SetActive(true);
             Bomb.SetActive(true);
             BombTrans.position = BombTarget.position;
             BombRigid.isKinematic = false;
-
-            PlayerLocal.Respawn();
 
             InProgress = true;
             RequestSerialization();

@@ -14,12 +14,19 @@ namespace Cekay.Grifball
         public HUD HeadsUp;
         public Combat CombatScript;
         public SettingsPage Settings;
+        public Player PlayerLocal;
 
         [SerializeField] private GameObject Hammer;
         [SerializeField] private GameObject HammerZone;
+        [SerializeField] private GameObject HeartAudio;
         [SerializeField] private AudioSource HammerAudio;
         [SerializeField] private Material HammerMatBlue;
         [SerializeField] private Material HammerMatRed;
+
+        [SerializeField] private GameObject HurtPost;
+        [SerializeField] private GameObject DeadPost;
+        [SerializeField] private GameObject SpawnPost;
+        [SerializeField] private GameObject EndPost;
 
         private VRCPlayerApi _localPlayer;
         public string LocalPlayerName;
@@ -27,6 +34,9 @@ namespace Cekay.Grifball
         private Vector3 LastRotation;
 
         private bool Swinging = false;
+
+        public int PlayerHealth = 100;
+        public int RespawnCountdown = 3;
 
         private void Start()
         {
@@ -137,6 +147,81 @@ namespace Cekay.Grifball
         //    }
         //}
 
+        public void Die()
+        {
+            PlayerHealth = 0;
+            SendCustomNetworkEvent(NetworkEventTarget.All, nameof(HammerHide));
+            HeartAudio.SetActive(false);
+            HurtPost.SetActive(false);
+            DeadPost.SetActive(false);
+            DeadPost.SetActive(true);
+            Settings.LocalPlayer.SetVoiceGain(0.0f);
+            Settings.LocalPlayer.SetWalkSpeed(0.0f);
+            Settings.LocalPlayer.SetStrafeSpeed(0.0f);
+            Settings.LocalPlayer.SetRunSpeed(0.0f);
+            Settings.LocalPlayer.SetJumpImpulse(0.0f);
+
+            SendCustomEventDelayedSeconds(nameof(RespawnTimer), 2.0f);
+        }
+
+        public void GetHurt()
+        {
+            PlayerHealth = 50;
+            HeartAudio.SetActive(true);
+            HurtPost.SetActive(true);
+        }
+
+        public void Heal()
+        {
+            PlayerHealth = 100;
+            HeartAudio.SetActive(false);
+            HurtPost.SetActive(false);
+        }
+
+        public void RespawnTimer()
+        {
+            RespawnCountdown--;
+            if (RespawnCountdown >= 0)
+            {
+                Settings.AnnouncerAudio.PlayOneShot(CombatScript.Boop);
+                SendCustomEventDelayedSeconds(nameof(RespawnTimer), 1.0f);
+            }
+            if (RespawnCountdown == -1)
+            {
+                Settings.AnnouncerAudio.PlayOneShot(CombatScript.Beep);
+                RespawnCountdown = 3;
+                SendCustomEventDelayedSeconds(nameof(Respawn), 1.0f);
+            }
+        }
+
+        public void Respawn()
+        {
+            int spawnInt = Random.Range(0, 3);
+            GameObject selectedSpawn = null;
+
+            if (CombatScript.CurrentTeam == "Blue")
+            {
+                selectedSpawn = CombatScript.BlueSpawns[spawnInt];
+            }
+            else if (CombatScript.CurrentTeam == "Red")
+            {
+                selectedSpawn = CombatScript.RedSpawns[spawnInt];
+            }
+
+            Settings.LocalPlayer.TeleportTo(selectedSpawn.transform.position, selectedSpawn.transform.rotation);
+
+            DeadPost.SetActive(false);
+            SpawnPost.SetActive(false);
+            SpawnPost.SetActive(true);
+            Settings.AnnouncerAudio.PlayOneShot(CombatScript.RespawnSound);
+            Settings.LocalPlayer.SetVoiceGain(1.0f);
+            Settings.LocalPlayer.SetWalkSpeed(Settings.MoveSpeed);
+            Settings.LocalPlayer.SetStrafeSpeed(Settings.MoveSpeed);
+            Settings.LocalPlayer.SetRunSpeed(Settings.MoveSpeed);
+            Settings.LocalPlayer.SetJumpImpulse(Settings.JumpHeight);
+            SendCustomNetworkEvent(NetworkEventTarget.All, nameof(HammerShow));
+        }
+
         public void GameStarted()
         {
             var mats = Hammer.GetComponent<MeshRenderer>().sharedMaterials;
@@ -152,12 +237,12 @@ namespace Cekay.Grifball
                 mats[3] = HammerMatBlue;
                 Hammer.GetComponent<MeshRenderer>().sharedMaterials = mats;
             }
-            Hammer.SetActive(true);
+            SendCustomNetworkEvent(NetworkEventTarget.All, nameof(HammerShow));
         }
 
         public void GameEnded()
         {
-            Hammer.SetActive(false);
+            SendCustomNetworkEvent(NetworkEventTarget.All, nameof(HammerHide));
         }
 
         public void HammerHide()
@@ -176,7 +261,7 @@ namespace Cekay.Grifball
             HammerAudio.PlayOneShot(CombatScript.Melees[Random.Range(0, CombatScript.Melees.Length)]);
             SendCustomEventDelayedSeconds(nameof(ResetHammer), 2.0f);
 
-            if (Settings.ShowMeter)
+            if (Settings.ShowMeter && PlayerHealth > 0)
             {
                 HeadsUp.EnableSwingMeter();
             }

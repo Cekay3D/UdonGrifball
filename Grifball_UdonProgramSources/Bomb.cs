@@ -10,12 +10,12 @@ namespace Cekay.Grifball
 
         public override void OnPickup()
         {
-            CombatScript.SendCustomNetworkEvent(NetworkEventTarget.All, nameof(CombatScript.GrabBomb));
+            CombatScript.SendCustomNetworkEvent(NetworkEventTarget.All, "GrabBomb");
         }
 
         public override void OnDrop()
         {
-            CombatScript.SendCustomNetworkEvent(NetworkEventTarget.All, nameof(CombatScript.DropBomb));
+            CombatScript.SendCustomNetworkEvent(NetworkEventTarget.All, "DropBomb");
         }
     }
 }

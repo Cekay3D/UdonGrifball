@@ -19,15 +19,16 @@ namespace Cekay.Grifball
         [SerializeField] private AudioClip Betrayal;
         [SerializeField] private AudioClip Betrayed;
 
-        [SerializeField] private PostProcessVolume PostStart;
-        [SerializeField] private PostProcessVolume Hurt;
-        [SerializeField] private PostProcessVolume Dead;
+        [SerializeField] private GameObject HurtPost;
+        [SerializeField] private GameObject DeadPost;
+        [SerializeField] private GameObject SpawnPost;
+        [SerializeField] private GameObject EndPost;
 
         [SerializeField] private GameObject[] BlueSpawns;
         [SerializeField] private GameObject[] RedSpawns;
 
         public int PlayerHealth = 100;
-        public int RespawnCountdown = 5;
+        public int RespawnCountdown = 3;
 
         private void Start()
         {
@@ -36,8 +37,9 @@ namespace Cekay.Grifball
 
         public void Die()
         {
-            Hurt.enabled = false;
-            Dead.enabled = true;
+            HurtPost.SetActive(false);
+            DeadPost.SetActive(false);
+            DeadPost.SetActive(true);
             Settings.LocalPlayer.SetVoiceGain(0.0f);
             Settings.LocalPlayer.SetWalkSpeed(0.0f);
             Settings.LocalPlayer.SetStrafeSpeed(0.0f);
@@ -52,12 +54,12 @@ namespace Cekay.Grifball
             RespawnCountdown--;
             if (RespawnCountdown >= 0)
             {
-                Announcer.PlayOneShot(Beep);
+                Announcer.PlayOneShot(Boop);
                 SendCustomEventDelayedSeconds(nameof(RespawnTimer), 1.0f);
             }
             if (RespawnCountdown == -1)
             {
-                Announcer.PlayOneShot(Boop);
+                Announcer.PlayOneShot(Beep);
                 RespawnCountdown = 3;
                 SendCustomEventDelayedSeconds(nameof(Respawn), 1.0f);
             }
@@ -79,8 +81,9 @@ namespace Cekay.Grifball
 
             Settings.LocalPlayer.TeleportTo(selectedSpawn.transform.position, selectedSpawn.transform.rotation);
 
-            Dead.enabled = false;
-            PostStart.enabled = true;
+            DeadPost.SetActive(false);
+            SpawnPost.SetActive(false);
+            SpawnPost.SetActive(true);
             Announcer.PlayOneShot(RespawnSound);
             Settings.LocalPlayer.SetVoiceGain(1.0f);
             Settings.LocalPlayer.SetWalkSpeed(Settings.MoveSpeed);

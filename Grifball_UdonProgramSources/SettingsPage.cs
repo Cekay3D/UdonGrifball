@@ -15,7 +15,7 @@ namespace Cekay.Grifball
 
         public VRCPlayerApi LocalPlayer;
 
-        [SerializeField] private AudioSource AnnouncerAudio;
+        public AudioSource AnnouncerAudio;
         [SerializeField] private AudioSource AmbienceAudio;
         [SerializeField] private AudioSource FootstepsAudio;
         [SerializeField] private AudioSource[] WeaponsAudio;
