@@ -39,17 +39,14 @@ namespace Cekay.Grifball
         public int PlayerHealth = 100;
         public int RespawnCountdown = 3;
 
-        private void Start()
-        {
-            _localPlayer = Networking.LocalPlayer;
-            LocalPlayerName = _localPlayer.displayName;
-        }
-
         [PublicAPI]
         public override void _OnOwnerSet()
         {
             if (Owner.isLocal)
             {
+                _localPlayer = Owner;
+                LocalPlayerName = Owner.displayName;
+
                 RequestSerialization();
             }
         }
