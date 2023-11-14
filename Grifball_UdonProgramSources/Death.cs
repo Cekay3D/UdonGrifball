@@ -4,13 +4,16 @@ using UnityEngine;
 using VRC.SDKBase;
 using VRC.Udon;
 
-public class Death : UdonSharpBehaviour
+namespace Cekay.Grifball
 {
-    public CyanPlayerObjectAssigner ObjAssign;
-    public override void OnPlayerTriggerEnter(VRCPlayerApi player)
+    public class Death : UdonSharpBehaviour
     {
-        UdonBehaviour targetScript = (UdonBehaviour)ObjAssign._GetPlayerPooledUdon(player);
+        public CyanPlayerObjectAssigner ObjAssign;
+        public override void OnPlayerTriggerEnter(VRCPlayerApi player)
+        {
+            UdonBehaviour targetScript = (UdonBehaviour)ObjAssign._GetPlayerPooledUdon(player);
 
-        targetScript.SendCustomEvent("Die");
+            targetScript.SendCustomEvent("Die");
+        }
     }
 }

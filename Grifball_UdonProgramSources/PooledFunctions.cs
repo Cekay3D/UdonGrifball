@@ -119,34 +119,6 @@ namespace Cekay.Grifball
             LastRotation = transform.rotation.eulerAngles;
         }
 
-        // TODO: Move local player functions to be pooled so each PlayerAPI can easily be called
-
-        //public override void OnPlayerCollisionEnter(VRCPlayerApi Player)
-        //{
-        //    if (Player != _localPlayer)
-        //    {
-        //        string playerName = Player.displayName;
-
-        //        if ((Settings.BlueTeam.Contains(playerName) && (CombatScript.CurrentTeam == "Red")) ||
-        //            (Settings.RedTeam.Contains(playerName) && (CombatScript.CurrentTeam == "Blue")))
-        //        {
-        //            Die();
-        //        }
-        //        else
-        //        {
-        //            if (Settings.FriendlyFire)
-        //            {
-        //                if ((Settings.RedTeam.Contains(playerName) && (CombatScript.CurrentTeam == "Red")) ||
-        //                    (Settings.BlueTeam.Contains(playerName) && (CombatScript.CurrentTeam == "Blue")))
-        //                {
-        //                    Die();
-        //                    KillBetrayal();
-        //                }
-        //            }
-        //        }
-        //    }
-        //}
-
         public void Die()
         {
             PlayerHealth = 0;
@@ -178,8 +150,18 @@ namespace Cekay.Grifball
             HurtPost.SetActive(false);
         }
 
+        private void KillBetrayed()
+        {
+            Settings.AnnouncerAudio.PlayOneShot(CombatScript.Betrayed);
+        }
+
         public void RespawnTimer()
         {
+            if (CombatScript.IsPaused)
+            {
+                return;
+            }
+
             RespawnCountdown--;
             if (RespawnCountdown >= 0)
             {

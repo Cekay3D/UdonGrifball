@@ -4,13 +4,16 @@ using UnityEngine;
 using VRC.SDKBase;
 using VRC.Udon;
 
-public class Hurt : UdonSharpBehaviour
+namespace Cekay.Grifball
 {
-    public CyanPlayerObjectAssigner ObjAssign;
-    public override void OnPlayerTriggerEnter(VRCPlayerApi player)
+    public class Hurt : UdonSharpBehaviour
     {
-        UdonBehaviour targetScript = (UdonBehaviour)ObjAssign._GetPlayerPooledUdon(player);
+        public CyanPlayerObjectAssigner ObjAssign;
+        public override void OnPlayerTriggerEnter(VRCPlayerApi player)
+        {
+            UdonBehaviour targetScript = (UdonBehaviour)ObjAssign._GetPlayerPooledUdon(player);
 
-        targetScript.SendCustomEvent("GetHurt");
+            targetScript.SendCustomEvent("GetHurt");
+        }
     }
 }

@@ -58,7 +58,10 @@ namespace Cekay.Grifball
         [SerializeField] private AudioClip SuddenDeath;
         [SerializeField] private AudioClip RoundOver;
         [SerializeField] private AudioClip GameOver;
+        public AudioClip Betrayal;
+        public AudioClip Betrayed;
         public AudioClip RespawnSound;
+        public AudioClip Hit;
         [SerializeField] private AudioClip Final;
 
         [SerializeField] private AudioClip s1;
@@ -309,6 +312,7 @@ namespace Cekay.Grifball
         public void EndGame()
         {
             Announcer.PlayOneShot(Final);
+            IsPaused = true;
             InProgress = false;
             InSuddenDeath = false;
 
@@ -369,7 +373,7 @@ namespace Cekay.Grifball
                 Announcer.PlayOneShot(SuddenDeath);
                 InSuddenDeath = true;
             }
-            if ((RoundCountdown == 0) && (BluePoints != RedPoints) && (RoundNumber == Settings.RoundsToPlay))
+            if ((RoundCountdown == 0) && (BluePoints != RedPoints) && (RoundNumber >= Settings.RoundsToPlay))
             {
                 Announcer.PlayOneShot(GameOver);
                 SendCustomEventDelayedSeconds(nameof(EndGame), 5.0f);
