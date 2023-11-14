@@ -23,7 +23,7 @@ namespace Cekay.Grifball
         [SerializeField] private Transform BombTrans;
         [SerializeField] private GameObject Bomb;
         [SerializeField] private Rigidbody BombRigid;
-        [SerializeField] private VRCPickup BombPickup;
+        public VRCPickup BombPickup;
         [SerializeField] private Material BombMat;
 
         [SerializeField] private PostProcessVolume PostStart;

@@ -211,6 +211,7 @@ namespace Cekay.Grifball
             Settings.LocalPlayer.TeleportTo(selectedSpawn.transform.position, selectedSpawn.transform.rotation);
 
             DeadPost.SetActive(false);
+            HurtPost.SetActive(false);
             SpawnPost.SetActive(false);
             SpawnPost.SetActive(true);
             Settings.AnnouncerAudio.PlayOneShot(CombatScript.RespawnSound);

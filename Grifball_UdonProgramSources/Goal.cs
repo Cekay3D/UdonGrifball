@@ -30,6 +30,7 @@ namespace Cekay.Grifball
                 RedPointsDisplay.text = CombatScript.RedPoints.ToString();
 
                 SendCustomNetworkEvent(NetworkEventTarget.All, nameof(WaitResetBlue));
+                CombatScript.BombPickup.Drop();
             }
             // Blue score
             else if (other.gameObject.layer == CombatScript.BlueBombLayer && gameObject.layer == CombatScript.RedGoalLayer)
@@ -45,6 +46,7 @@ namespace Cekay.Grifball
                 BluePointsDisplay.text = CombatScript.BluePoints.ToString();
 
                 SendCustomNetworkEvent(NetworkEventTarget.All, nameof(WaitResetRed));
+                CombatScript.BombPickup.Drop();
             }
         }
 
