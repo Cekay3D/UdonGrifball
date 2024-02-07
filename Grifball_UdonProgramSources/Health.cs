@@ -23,7 +23,8 @@ namespace Cekay.Grifball
             TargetScript = (UdonBehaviour)ObjAssign._GetPlayerPooledUdon(Networking.LocalPlayer);
             if ((int)TargetScript.GetProgramVariable("PlayerHealth") < 100)
             {
-                TargetScript.SendCustomNetworkEvent(NetworkEventTarget.All, "Heal");
+                TargetScript.SendCustomNetworkEvent(NetworkEventTarget.All, "SetHealedNetwork");
+                TargetScript.SendCustomEvent("SetHealedLocal");
                 SendCustomNetworkEvent(NetworkEventTarget.All, nameof(HealthGrab));
             }
         }

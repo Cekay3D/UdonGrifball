@@ -15,6 +15,11 @@ namespace Cekay.Grifball
         public Combat CombatScript;
         public SettingsPage Settings;
 
+        public VRCPlayerApi playerAssignedPlayer;
+        public VRCPlayerApi playerUnassignedPlayer;
+        public int playerAssignedIndex;
+        public int playerUnassignedIndex;
+
         [SerializeField] private GameObject Hammer;
         [SerializeField] private GameObject HammerZone;
         [SerializeField] private GameObject HeartAudio;
@@ -29,7 +34,6 @@ namespace Cekay.Grifball
 
         [SerializeField] private ParticleSystem Confetti;
 
-        private VRCPlayerApi _localPlayer;
         public string LocalPlayerName;
 
         private Vector3 LastRotation;
@@ -44,11 +48,12 @@ namespace Cekay.Grifball
         {
             if (Owner.isLocal)
             {
-                _localPlayer = Owner;
                 LocalPlayerName = Owner.displayName;
 
                 RequestSerialization();
             }
+
+            Debug.Log("FUCK " + Owner.displayName);
         }
 
         [PublicAPI]
@@ -83,7 +88,7 @@ namespace Cekay.Grifball
             {
                 if (Swinging == false)
                 {
-                    if (_localPlayer.IsUserInVR() == false)
+                    if (Owner.IsUserInVR() == false)
                     {
                         if (Input.GetMouseButtonDown(0))
                         {
@@ -101,7 +106,7 @@ namespace Cekay.Grifball
                             Swinging = true;
                         }
                     }
-                    else if (_localPlayer.IsUserInVR() == true)
+                    else if (Owner.IsUserInVR() == true)
                     {
                         Vector3 RotationDifference = new Vector3(transform.rotation.eulerAngles.x - LastRotation.x,
                                                                  transform.rotation.eulerAngles.y - LastRotation.y,
@@ -125,11 +130,8 @@ namespace Cekay.Grifball
             HurtPost.SetActive(false);
             DeadPost.SetActive(false);
             DeadPost.SetActive(true);
-            Settings.LocalPlayer.SetVoiceGain(0.0f);
-            Settings.LocalPlayer.SetWalkSpeed(0.0f);
-            Settings.LocalPlayer.SetStrafeSpeed(0.0f);
-            Settings.LocalPlayer.SetRunSpeed(0.0f);
-            Settings.LocalPlayer.SetJumpImpulse(0.0f);
+            Owner.SetVoiceGain(0.0f);
+            CombatScript.SetImmobile();
 
             if (LocalPlayerName == "Cekay")
             {
@@ -146,9 +148,13 @@ namespace Cekay.Grifball
             HurtPost.SetActive(true);
         }
 
-        public void Heal()
+        public void SetHealedNetwork()
         {
             PlayerHealth = 100;
+        }
+        
+        public void SetHealedLocal()
+        {
             HeartAudio.SetActive(false);
             HurtPost.SetActive(false);
         }
@@ -181,34 +187,14 @@ namespace Cekay.Grifball
 
         public void Respawn()
         {
-            int spawnInt = Random.Range(0, 3);
-            GameObject selectedSpawn = null;
-
-            if (CombatScript.CurrentTeam == "Blue")
-            {
-                selectedSpawn = CombatScript.BlueSpawns[spawnInt];
-            }
-            else if (CombatScript.CurrentTeam == "Red")
-            {
-                selectedSpawn = CombatScript.RedSpawns[spawnInt];
-            }
-            else
-            {
-                selectedSpawn = CombatScript.BlueSpawns[spawnInt];
-            }
-
-            Settings.LocalPlayer.TeleportTo(selectedSpawn.transform.position, selectedSpawn.transform.rotation);
+            CombatScript.RespawnLocal();
 
             DeadPost.SetActive(false);
             HurtPost.SetActive(false);
             SpawnPost.SetActive(false);
             SpawnPost.SetActive(true);
             Settings.AnnouncerAudio.PlayOneShot(CombatScript.RespawnSound);
-            Settings.LocalPlayer.SetVoiceGain(1.0f);
-            Settings.LocalPlayer.SetWalkSpeed(Settings.MoveSpeed);
-            Settings.LocalPlayer.SetStrafeSpeed(Settings.MoveSpeed);
-            Settings.LocalPlayer.SetRunSpeed(Settings.MoveSpeed);
-            Settings.LocalPlayer.SetJumpImpulse(Settings.JumpHeight);
+            CombatScript.SetMobile();
             SendCustomNetworkEvent(NetworkEventTarget.All, nameof(HammerShow));
         }
 
@@ -216,13 +202,12 @@ namespace Cekay.Grifball
         {
             var mats = Hammer.GetComponent<MeshRenderer>().sharedMaterials;
 
-            string heldBy = _localPlayer.displayName;
-            if (Settings.RedTeam.Contains(heldBy))
+            if (Settings.RedTeam.Contains(LocalPlayerName))
             {
                 mats[3] = HammerMatRed;
                 Hammer.GetComponent<MeshRenderer>().sharedMaterials = mats;
             }
-            if (Settings.BlueTeam.Contains(heldBy))
+            if (Settings.BlueTeam.Contains(LocalPlayerName))
             {
                 mats[3] = HammerMatBlue;
                 Hammer.GetComponent<MeshRenderer>().sharedMaterials = mats;

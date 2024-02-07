@@ -23,9 +23,9 @@ namespace Cekay.Grifball
         [SerializeField] private AudioClip Hover;
         [SerializeField] private AudioClip Click;
 
-        public int MoveSpeed = 12;
-        public int MoveSpeedCarrier = 12;
-        public int JumpHeight = 8;
+        public float MoveSpeed = 12.0f;
+        public float MoveSpeedCarrier = 12.0f;
+        public float JumpHeight = 8.0f;
         public int RoundLength = 60;
         public int RoundsToPlay = 3;
         public bool BallPhysics = false;

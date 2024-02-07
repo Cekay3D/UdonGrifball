@@ -214,8 +214,11 @@ namespace Cekay.Grifball
 
             foreach (PooledFunctions p in Players)
             {
-                p.SendCustomNetworkEvent(NetworkEventTarget.All, "GameStarted");
-                p.SendCustomNetworkEvent(NetworkEventTarget.All, "Respawn");
+                if (p.GetProgramVariable("Owner") != null)
+                {
+                    p.SendCustomNetworkEvent(NetworkEventTarget.All, "GameStarted");
+                    p.SendCustomNetworkEvent(NetworkEventTarget.All, "Respawn");
+                }
             }
 
             PostStart.gameObject.SetActive(true);
@@ -565,6 +568,39 @@ namespace Cekay.Grifball
             //{
             //    Announcer.PlayOneShot(Killjoy);
             //}
+        }
+
+        public void SetMobile()
+        {
+            LocalPlayerAPI.Immobilize(false);
+            LocalPlayerAPI.SetJumpImpulse(Settings.JumpHeight);
+        }
+        
+        public void SetImmobile()
+        {
+            LocalPlayerAPI.Immobilize(true);
+            LocalPlayerAPI.SetJumpImpulse(0.0f);
+        }
+
+        public void RespawnLocal()
+        {
+            int spawnInt = Random.Range(0, 3);
+            GameObject selectedSpawn = null;
+
+            if (CurrentTeam == "Blue")
+            {
+                selectedSpawn = BlueSpawns[spawnInt];
+            }
+            else if (CurrentTeam == "Red")
+            {
+                selectedSpawn = RedSpawns[spawnInt];
+            }
+            else
+            {
+                selectedSpawn = BlueSpawns[spawnInt];
+            }
+
+            LocalPlayerAPI.TeleportTo(selectedSpawn.transform.position, selectedSpawn.transform.rotation);
         }
     }
 }
